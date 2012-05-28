@@ -15,14 +15,20 @@ task :build_all, [:config] do |t, args|
 	}
 end
 
-def minify_js(options)
+def minify_js(config)
+	options = {
+		"compiler" => "closure",
+		"level" => "simple"
+	}
+	if config.key?("options")
+		options = options.merge(config["options"])
+	end
+end
+
+def minify_css(config)
 
 end
 
-def minify_css(options)
-
-end
-
-def minify_html(options)
+def minify_html(config)
 
 end
