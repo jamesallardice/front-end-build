@@ -4,6 +4,8 @@ TEMP = "temp"
 
 CLOSURE_PATH = "lib/compiler.jar"
 
+YUI_PATH = "lib/yuicompressor-2.4.7.jar"
+
 require "rake"
 require "json"
 
@@ -40,6 +42,8 @@ def minify_js(config)
 			case inputOptions["compiler"]
 			when "closure"
 				system "java -jar #{CLOSURE_PATH} --js #{file} --js_output_file #{compiled}"
+			when "yui"
+				system "java -jar #{YUI_PATH} --type js -o #{compiled} #{file}"
 			end
 		}
 	}
