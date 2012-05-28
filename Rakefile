@@ -1,8 +1,10 @@
+CONFIG_FILE = "build-conf.json"
+
 require "rake"
 require "json"
 
 task :build_all, [:config] do |t, args|
-	config = JSON.parse(IO.read(args.config))
+	config = JSON.parse(IO.read(args.config + "/#{CONFIG_FILE}"))
 	config.each{ |k, v|
 		case k
 		when "js"
