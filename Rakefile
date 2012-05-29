@@ -91,12 +91,15 @@ def minify_js(config)
 	}
 end
 
-# TODO: Add ability to pass options to JSLint
 # TODO: Investigate any other JavaScript lint tools (JSLint is currently the only option in this script)
 def validate_js(file, options)
 	puts "Validating #{file}..."
 	path = File.join($config_path, file)
-	results = `java -jar #{JSLINT_PATH} #{path}`
+	args = ""
+	options.each { |option|
+		args << " --#{option}"
+	}
+	results = `java -jar #{JSLINT_PATH} #{args} #{path}`
 	if !results.empty?
 		puts "\t#{results}"
 		puts "\n\tJavaScript validation failed.\n\n"
