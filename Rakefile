@@ -18,6 +18,8 @@ CLOSURE_PATH = "lib/compiler.jar"
 
 YUI_PATH = "lib/yuicompressor-2.4.7.jar"
 
+HTMLCOMPRESSOR_PATH = "lib/htmlcompressor-1.5.3.jar"
+
 ###############################################################################################
 # End of configuration
 # You shouldn't need to edit anything beyond this point
@@ -101,8 +103,16 @@ def minify_css(config)
 	}
 end
 
+# TODO: Add ability to pass options to HtmlCompressor
+# TODO: Investigate any other HTML compression tools (HtmlCompressor is currently the only option in this script)
+# TODO: Investigate possibility of adding ability to concatenate HTML files (currently each file is compressed and that's it)
 def minify_html(config)
-
+	outputdir = config["outputdir"]
+	config["output"].each{ |input|
+		file = File.join($config_path, input["file"])
+		compressed = File.join($config_path, outputdir, input["file"])
+		system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compressed} #{file}"
+	}
 end
 
 def concat(files, output)
