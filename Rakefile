@@ -25,6 +25,12 @@ task :build_all, [:config] do |t, args|
 	}
 end
 
+CLOSURE_LEVELS = {
+	"whitespace" => "WHITESPACE_ONLY",
+	"simple" => "SIMPLE_OPTIMIZATIONS",
+	"advanced" => "ADVANCED_OPTIMIZATIONS"
+}
+
 def minify_js(config)
 	options = {
 		"compiler" => "closure",
@@ -33,6 +39,7 @@ def minify_js(config)
 	if config.key?("options")
 		options = options.merge(config["options"])
 	end
+	closureLevel = CLOSURE_LEVELS[options["level"]]
 	config["output"].each{ |name, output|
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
 		outputFiles = Array.new
@@ -43,7 +50,7 @@ def minify_js(config)
 			outputFiles << compiled
 			case inputOptions["compiler"]
 			when "closure"
-				system "java -jar #{CLOSURE_PATH} --js #{file} --js_output_file #{compiled}"
+				system "java -jar #{CLOSURE_PATH} --compilation_level #{closureLevel} --js #{file} --js_output_file #{compiled}"
 			when "yui"
 				system "java -jar #{YUI_PATH} --type js -o #{compiled} #{file}"
 			end
