@@ -49,6 +49,7 @@ CLOSURE_LEVELS = {
 }
 
 # TODO: Add ability to specify `--externs` options to Closure compiler
+# TODO: Add ability to specify `--line-break`, `--nomunge`, `--preserve-semi` and `--disable-optimizations` arguments to YUI
 def minify_js(config)
 	options = {
 		"compiler" => "closure",
@@ -74,12 +75,30 @@ def minify_js(config)
 			end
 		}
 		concat(outputFiles, File.join($config_path, name))
-
 	}
 end
 
+# TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
+# TODO: Investigate a reasonable line length for compressed file (500 has been plucked out of the air)
 def minify_css(config)
-
+	options = {
+		"linebreak" => 500
+	}
+	if config.key?("options")
+		options = options.merge(config["options"])
+	end
+	config["output"].each{ |name, output|
+		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
+		outputFiles = Array.new
+		output["input"].each_with_index{ |input, i|
+			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
+			file = File.join($config_path, input["file"])
+			compiled = File.join(TEMP, "#{i}.css")
+			outputFiles << compiled
+			system "java -jar #{YUI_PATH} --type css --line-break #{options['linebreak']} -o #{compiled} #{file}"
+		}
+		concat(outputFiles, File.join($config_path, name))
+	}
 end
 
 def minify_html(config)
