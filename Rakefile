@@ -35,10 +35,12 @@ def minify_js(config)
 	end
 	config["output"].each{ |name, output|
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
+		outputFiles = Array.new
 		output["input"].each_with_index{ |input, i|
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			file = File.join($config_path, input["file"])
 			compiled = File.join(TEMP, "#{i}.js")
+			outputFiles << compiled
 			case inputOptions["compiler"]
 			when "closure"
 				system "java -jar #{CLOSURE_PATH} --js #{file} --js_output_file #{compiled}"
@@ -46,6 +48,8 @@ def minify_js(config)
 				system "java -jar #{YUI_PATH} --type js -o #{compiled} #{file}"
 			end
 		}
+		concat(outputFiles, File.join($config_path, name))
+
 	}
 end
 
@@ -55,4 +59,12 @@ end
 
 def minify_html(config)
 
+end
+
+def concat(files, output)
+	File.open(output, "w") { |file|
+		file.puts files.map { |s|
+			IO.read(s)
+		}
+	}
 end
