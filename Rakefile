@@ -20,6 +20,8 @@ YUI_PATH = "lib/yuicompressor-2.4.7.jar"
 
 HTMLCOMPRESSOR_PATH = "lib/htmlcompressor-1.5.3.jar"
 
+JSLINT_PATH = "lib/jslint4java-2.0.2.jar"
+
 ###############################################################################################
 # End of configuration
 # You shouldn't need to edit anything beyond this point
@@ -44,6 +46,8 @@ task :build_all, [:config] do |t, args|
 	}
 end
 
+OUTPUT_SEPARATOR = "----------------------------\n\n"
+
 CLOSURE_LEVELS = {
 	"whitespace" => "WHITESPACE_ONLY",
 	"simple" => "SIMPLE_OPTIMIZATIONS",
@@ -53,7 +57,8 @@ CLOSURE_LEVELS = {
 # TODO: Add ability to specify `--externs` options to Closure compiler
 # TODO: Add ability to specify `--line-break`, `--nomunge`, `--preserve-semi` and `--disable-optimizations` arguments to YUI
 def minify_js(config)
-	puts "\nCompressing JavaScript files"
+	puts "\nProcessing JavaScript files"
+	puts OUTPUT_SEPARATOR
 	options = {
 		"compiler" => "closure",
 		"level" => "simple",
@@ -70,7 +75,7 @@ def minify_js(config)
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			file = File.join($config_path, input["file"])
 			if inputOptions["lint"]
-				validate_js(file, inputOptions["lint"])
+				validate_js(input["file"], inputOptions["lint"])
 			end
 			puts "Compressing #{input['file']}..."
 			compiled = File.join(TEMP, "#{i}.js")
@@ -86,14 +91,26 @@ def minify_js(config)
 	}
 end
 
+# TODO: Add ability to pass options to JSLint
+# TODO: Investigate any other JavaScript lint tools (JSLint is currently the only option in this script)
 def validate_js(file, options)
-
+	puts "Validating #{file}..."
+	path = File.join($config_path, file)
+	results = `java -jar #{JSLINT_PATH} #{path}`
+	if !results.empty?
+		puts "\t#{results}"
+		puts "\n\tJavaScript validation failed.\n\n"
+		exit 1
+	else
+		puts "\tPassed!"
+	end
 end
 
 # TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
 # TODO: Investigate a reasonable line length for compressed file (500 has been plucked out of the air)
 def minify_css(config)
-	puts "\nCompressing CSS files"
+	puts "\nProcessing CSS files"
+	puts OUTPUT_SEPARATOR
 	options = {
 		"linebreak" => 500
 	}
@@ -119,7 +136,8 @@ end
 # TODO: Investigate any other HTML compression tools (HtmlCompressor is currently the only option in this script)
 # TODO: Investigate possibility of adding ability to concatenate HTML files (currently each file is compressed and that's it)
 def minify_html(config)
-	puts "\nCompressing files containing HTML"
+	puts "\nProcessing markup files"
+	puts OUTPUT_SEPARATOR
 	outputdir = config["outputdir"]
 	config["output"].each{ |input|
 		puts "Compressing #{input['file']}..."
