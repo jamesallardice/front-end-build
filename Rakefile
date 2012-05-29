@@ -28,7 +28,7 @@ require "json"
 
 task :build_all, [:config] do |t, args|
 	$config_path = args.config
-	config = JSON.parse(IO.read(args.config + "/#{CONFIG_FILE}"))
+	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
 	Dir.mkdir(TEMP) unless File.exists?(TEMP)
 	config.each{ |k, v|
 		case k
