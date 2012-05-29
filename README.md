@@ -23,15 +23,42 @@ Since Full Frontal is designed to be a complete front-end build tool, there are 
 
 `html` - Configuration for building files containing markup
 
-Each configuration section must contain an `ouput` property, and optionally and `options` property.
+Each configuration section must contain an `ouput` property, and optionally and `options` property. The format of the value of that property depends on the section. See the documentation of each section for the details.
 
-### Output files
+### JavaScript
 
-Your configuration file specifies the result of the build process. Usually, you want to get some files out of that process (e.g. minified scripts). For this reason, each of your main config sections must contain an `output` property. This property should hold a map of output file names to inputs:
+JavaScript configuration is placed in the `js` property. The `js` property must contain an `output` property, and may contain an `options` property. If an `options` property is specified at this level, it will be applied to every file to be processed (although options can be overridden, as you will see). The `output` property must contain an `input` property. Here's a basic template:
 
 ```javascript
 {
   "js": {
+    "options": {
+      "compiler": "closure",
+      "level": "simple"
+    },
+    "output": {
+      "mylibrary.min.js": {
+        "input": [
+          { "file": "module1.js" },
+          { "file": "module2.js" }
+        ]
+      }
+    }
+  }
+}
+```
+
+The above example specifies two input files, *module1.js* and *module2.js*, to be compiled and concatenated into *mylibrary.min.js*. As the `options` property is set at the root level, those options apply to each of the input files.
+
+You can specify as many output targets as you like, each with as many inputs as necessary:
+
+```javascript
+{
+  "js": {
+    "options": {
+      "compiler": "closure",
+      "level": "simple"
+    },
     "output": {
       "mylibrary.min.js": {
         "input": [
@@ -39,12 +66,30 @@ Your configuration file specifies the result of the build process. Usually, you 
           { "file": "module2.js" }
         ]
       },
-      "mydir/anotherlib.min.js": {
+      "anotherlib.min.js": {
+        { "file": "unminified.js" }
+      }
+    }
+  }
+}
+```
+
+The above example will result in two minified files, *mylibrary.min.js* and *anotherlib.min.js*. Again, because `options` has been set at the root level, those options apply to all of the input files. If you want to specify different options for different output files, you can set the `options` property at any `output` level. Options set at this level will be merged with those set at the root level (if any), with the more specific values overriding the less specific. For example:
+
+```javascript
+{
+  "js": {
+    "options": {
+      "compiler": "closure",
+      "level": "simple"
+    },
+    "output": {
+      "mylibrary.min.js": {
         "options": {
-          "compiler": "yui"
+          "level": "advanced"
         },
         "input": [
-          { "file": "lib.js" }
+          { "file": "module1.js" }
         ]
       }
     }
@@ -52,70 +97,35 @@ Your configuration file specifies the result of the build process. Usually, you 
 }
 ```
 
-This example demonstrates several important points, which we will cover over the few sections. Notice how the `output` property can contain any number of output file names.
-
-**Options**
-
-Notice how only one of the output files specifies a set of `options`. Options can be specified at every level of the config file. If you want a set of options to apply to all output files, you can set them at the root level:
+In the above example, the `level` option will be overridden for each of the input files that make up *mylibrary.min.js*. The `compiler` option will not be overridden, so the value from the root level `options` will be used. If you need even finer control, it is also possible to specify options at the input level. Again, options set at this level will be merged with those set at the previous levels:
 
 ```javascript
 {
   "js": {
     "options": {
       "compiler": "closure",
-      "level": "advanced"
+      "level": "simple"
     },
-    "output": //...
-  }
-}
-```
-
-If you want to apply different options to different output files, you can specify options at each `output` level. Note that options specified here will be merged with those specified higher up, with values from the more specific set overriding those from the less specific set:
-
-```javascript
-{
-  "js": {
     "output": {
       "mylibrary.min.js": {
-        "options": {
-          "compiler": "yui"
-        },
-        "input": //...
+        "input": [
+          { 
+            "file": "module1.js",
+            "options": {
+              "level": "advanced"
+            }
+          },
+          { "file": "module2.js" }
+        ]
       }
     }
   }
 }
 ```
 
-Finally, for even more control, you can specify options at the input file level. This allows you to give special treatment to files with certain requirements, without having to mess around and manually concatenate separately minified scripts:
+In this example, *module1.js* will be compiled in `advanced` mode, since the `level` option overrides the `level` option set at the root level. However, *module2.js* will be compiled in `simple` mode, using the root level options, since no `options` property has been set on that input file. This means it's possible to minify different scripts in different ways, and still end up with them all in the same concatenated file.
 
-```javascript
-{
-  "js": {
-    "output": {
-      "mylibrary.min.js": {
-        "input": [{
-          "file": "module1.js",
-          "options": {
-            "compiler": "closure",
-            "level": "whitespace"
-          }
-         }, {
-          "file": "module2.js"
-         }]
-      }
-    }
-  }
-}
-```
-
-In this example, *module1.js* will be compiled according to the specific options applied to it, whereas *module2.js* will  be compiled with the default options (or options specified higher up the tree, if applicable). After compilation, the results will be concatentated into *mylibrary.min.js*.
-
-**Input files**
-
-Every output file must contain an `input` property. The `input` property holds a list of files to be compiled/minified and then concatenated into the output file. So, in the above example you would get two output files, relative to the path of your config file, `mylibrary.min.js` and `mydir/anotherlib.min.js`.
-
-### JavaScript
+**Options**
 
 <table>
     <thead>
@@ -138,6 +148,12 @@ Every output file must contain an `input` property. The `input` property holds a
             <td>The compilation level to apply (only applies to <code>closure</code> compiler)</td>
             <td><code>whitespace | simple | advanced</code></td>
             <td><code>simple</code></td>
+        </tr>
+        <tr>
+            <td><code>lint</code></td>
+            <td>If present, the options to pass to JSLint (see JSLint options below)</td>
+            <td><code>Array [String]</code></td>
+            <td>undefined</td>
         </tr>
     </tbody>
 </table>
