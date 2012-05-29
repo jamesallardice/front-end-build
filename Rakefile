@@ -1,10 +1,27 @@
+###############################################################################################
+# Configuration used throughout the script
+# You probably only want to change these if you want to name your config file differently
+###############################################################################################
+
+# The name of the config file to load (in the directory passed to the task as an argument)
 CONFIG_FILE = "build-conf.json"
 
+# The name of the temporary directory (relative to this script) which will store intermediate files
 TEMP = "temp"
+
+###############################################################################################
+# Paths to tools and utilities used throughout the build process
+# You shouldn't need to edit these unless you want to use a different version of some tool
+###############################################################################################
 
 CLOSURE_PATH = "lib/compiler.jar"
 
 YUI_PATH = "lib/yuicompressor-2.4.7.jar"
+
+###############################################################################################
+# End of configuration
+# You shouldn't need to edit anything beyond this point
+###############################################################################################
 
 require "rake"
 require "json"
@@ -31,6 +48,7 @@ CLOSURE_LEVELS = {
 	"advanced" => "ADVANCED_OPTIMIZATIONS"
 }
 
+# TODO: Add ability to specify `--externs` options to Closure compiler
 def minify_js(config)
 	options = {
 		"compiler" => "closure",
