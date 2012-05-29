@@ -53,9 +53,11 @@ CLOSURE_LEVELS = {
 # TODO: Add ability to specify `--externs` options to Closure compiler
 # TODO: Add ability to specify `--line-break`, `--nomunge`, `--preserve-semi` and `--disable-optimizations` arguments to YUI
 def minify_js(config)
+	puts "\nCompressing JavaScript files"
 	options = {
 		"compiler" => "closure",
-		"level" => "simple"
+		"level" => "simple",
+		"lint" => false
 	}
 	if config.key?("options")
 		options = options.merge(config["options"])
@@ -67,6 +69,10 @@ def minify_js(config)
 		output["input"].each_with_index{ |input, i|
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			file = File.join($config_path, input["file"])
+			if inputOptions["lint"]
+				validate_js(file, inputOptions["lint"])
+			end
+			puts "Compressing #{input['file']}..."
 			compiled = File.join(TEMP, "#{i}.js")
 			outputFiles << compiled
 			case inputOptions["compiler"]
@@ -80,9 +86,14 @@ def minify_js(config)
 	}
 end
 
+def validate_js(file, options)
+
+end
+
 # TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
 # TODO: Investigate a reasonable line length for compressed file (500 has been plucked out of the air)
 def minify_css(config)
+	puts "\nCompressing CSS files"
 	options = {
 		"linebreak" => 500
 	}
@@ -93,6 +104,7 @@ def minify_css(config)
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
 		outputFiles = Array.new
 		output["input"].each_with_index{ |input, i|
+			puts "Compressing #{input['file']}..."
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			file = File.join($config_path, input["file"])
 			compiled = File.join(TEMP, "#{i}.css")
@@ -107,8 +119,10 @@ end
 # TODO: Investigate any other HTML compression tools (HtmlCompressor is currently the only option in this script)
 # TODO: Investigate possibility of adding ability to concatenate HTML files (currently each file is compressed and that's it)
 def minify_html(config)
+	puts "\nCompressing files containing HTML"
 	outputdir = config["outputdir"]
 	config["output"].each{ |input|
+		puts "Compressing #{input['file']}..."
 		file = File.join($config_path, input["file"])
 		compressed = File.join($config_path, outputdir, input["file"])
 		system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compressed} #{file}"
