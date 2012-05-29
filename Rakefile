@@ -22,6 +22,10 @@ HTMLCOMPRESSOR_PATH = "lib/htmlcompressor-1.5.3.jar"
 
 JSLINT_PATH = "lib/jslint4java-2.0.2.jar"
 
+CSSLINT_PATH = "lib/csslint-rhino.js"
+
+RHINO_PATH = "lib/rhino.jar"
+
 ###############################################################################################
 # End of configuration
 # You shouldn't need to edit anything beyond this point
@@ -124,8 +128,11 @@ def minify_css(config)
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
 		outputFiles = Array.new
 		output["input"].each_with_index{ |input, i|
-			puts "Compressing #{input['file']}..."
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
+			if(inputOptions["lint"])
+				validate_css(input["file"], inputOptions["lint"])
+			end
+			puts "Compressing #{input['file']}..."
 			file = File.join($config_path, input["file"])
 			compiled = File.join(TEMP, "#{i}.css")
 			outputFiles << compiled
@@ -133,6 +140,25 @@ def minify_css(config)
 		}
 		concat(outputFiles, File.join($config_path, name))
 	}
+end
+
+# TODO: Investigate any other CSS lint tools (CSSLint is currently the only option in this script)
+def validate_css(file, options)
+	puts "Validating #{file}..."
+	path = File.join($config_path, file)
+	args = ""
+	options.each { |option|
+		args << "#{option},"
+	}
+	results = `java -jar #{RHINO_PATH} #{CSSLINT_PATH} #{path} --rules=#{args}`
+	noerror = /csslint\: No errors/
+	if !(noerror =~ results)
+		puts "\t#{results}"
+		puts "\n\tCSS validation failed.\n\n"
+		exit 1
+	else
+		puts "\tPassed!"
+	end
 end
 
 # TODO: Add ability to pass options to HtmlCompressor
