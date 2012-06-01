@@ -204,7 +204,8 @@ tasks = {
 	"minifyhtml" => minifyhtml
 }
 
-task :build_all, [:config] do |t, args|
+task :build, [:config] do |t, args|
+	args.with_defaults(:config => Dir.pwd)
 	$config_path = args.config
 	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
 	Dir.mkdir(TEMP) unless File.exists?(TEMP)
