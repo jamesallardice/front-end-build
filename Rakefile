@@ -22,6 +22,8 @@ HTMLCOMPRESSOR_PATH = "lib/htmlcompressor-1.5.3.jar"
 
 JSLINT_PATH = "lib/jslint4java-2.0.2.jar"
 
+JSHINT_PATH = "lib/jshint-rhino.js"
+
 CSSLINT_PATH = "lib/csslint-rhino.js"
 
 RHINO_PATH = "lib/rhino.jar"
@@ -95,7 +97,6 @@ def minify_js(config)
 	}
 end
 
-# TODO: Investigate any other JavaScript lint tools (JSLint is currently the only option in this script)
 def validate_js(config)
 	puts "\nValidating JavaScript files"
 	puts OUTPUT_SEPARATOR
@@ -108,12 +109,20 @@ def validate_js(config)
 	config["files"].each{ |file|
 		fileOptions = file.key?("options") ? options.merge(file["options"]) : options
 		puts "Validating #{file['file']}..."
-		args = ""
-		fileOptions["jslintoptions"].each{ |option|
-			args << " --#{option}"
-		}
 		path = File.join($config_path, file["file"])
-		results = `java -jar #{JSLINT_PATH} #{args} #{path}`
+		args = ""
+		case fileOptions["validator"]
+		when "jslint"
+			fileOptions["jslintoptions"].each{ |option|
+				args << " --#{option}"
+			}
+			results = `java -jar #{JSLINT_PATH} #{args} #{path}`
+		when "jshint"
+			results = `java -jar #{RHINO_PATH} #{JSHINT_PATH} #{path}`
+		else
+			puts "\nUnknown JavaScript validator. Available options are 'jslint' and 'jshint'.\n\n"
+			exit 1
+		end
 		if !results.empty?
 			puts "\t#{results}"
 			puts "\n\tJavaScript validation failed.\n\n"
