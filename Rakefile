@@ -98,13 +98,9 @@ validatejs = lambda { |config|
 		fileOptions = file.key?("options") ? options.merge(file["options"]) : options
 		puts "Validating #{file['file']}..."
 		path = File.join($config_path, file["file"])
-		args = ""
 		case fileOptions["validator"]
 		when "jslint"
-			fileOptions["jslintoptions"].each{ |option|
-				args << " --#{option}"
-			}
-			results = `java -jar #{JSLINT_PATH} #{args} #{path}`
+			results = `java -jar #{JSLINT_PATH} #{path}`
 		when "jshint"
 			results = `java -jar #{RHINO_PATH} #{JSHINT_PATH} #{path}`
 		else
