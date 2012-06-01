@@ -41,8 +41,8 @@ task :build_all, [:config] do |t, args|
 	config.each{ |k, v|
 		case k
 		when "minifyjs"
-			minify_js_new(v)
-		when "css"
+			minify_js(v)
+		when "minifycss"
 			minify_css(v)
 		when "html"
 			minify_html(v)
@@ -112,7 +112,7 @@ end
 # TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
 # TODO: Investigate a reasonable line length for compressed file (500 has been plucked out of the air)
 def minify_css(config)
-	puts "\nProcessing CSS files"
+	puts "\nMinifying CSS files"
 	puts OUTPUT_SEPARATOR
 	options = {
 		"linebreak" => 500
@@ -125,9 +125,6 @@ def minify_css(config)
 		outputFiles = Array.new
 		output["input"].each_with_index{ |input, i|
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
-			if(inputOptions["lint"])
-				validate_css(input["file"], inputOptions["lint"])
-			end
 			puts "Compressing #{input['file']}..."
 			file = File.join($config_path, input["file"])
 			compiled = File.join(TEMP, "#{i}.css")
