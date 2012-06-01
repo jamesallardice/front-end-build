@@ -46,6 +46,8 @@ task :build_all, [:config] do |t, args|
 			minify_css(v)
 		when "minifyhtml"
 			minify_html(v)
+		when "validatejs"
+			validate_js(v)
 		end
 	}
 end
@@ -92,21 +94,32 @@ def minify_js(config)
 end
 
 # TODO: Investigate any other JavaScript lint tools (JSLint is currently the only option in this script)
-def validate_js(file, options)
-	puts "Validating #{file}..."
-	path = File.join($config_path, file)
-	args = ""
-	options.each { |option|
-		args << " --#{option}"
+def validate_js(config)
+	puts "\nValidating JavaScript files"
+	puts OUTPUT_SEPARATOR
+	options = {
+		"validator" => "jslint"
 	}
-	results = `java -jar #{JSLINT_PATH} #{args} #{path}`
-	if !results.empty?
-		puts "\t#{results}"
-		puts "\n\tJavaScript validation failed.\n\n"
-		exit 1
-	else
-		puts "\tPassed!"
+	if config.key?("options")
+		options = options.merge(config["options"])
 	end
+	config["files"].each{ |file|
+		fileOptions = file.key?("options") ? options.merge(file["options"]) : options
+		puts "Validating #{file['file']}..."
+		args = ""
+		fileOptions["jslintoptions"].each{ |option|
+			args << " --#{option}"
+		}
+		path = File.join($config_path, file["file"])
+		results = `java -jar #{JSLINT_PATH} #{args} #{path}`
+		if !results.empty?
+			puts "\t#{results}"
+			puts "\n\tJavaScript validation failed.\n\n"
+			exit 1
+		else
+			puts "\tPassed!"
+		end
+	}
 end
 
 # TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
