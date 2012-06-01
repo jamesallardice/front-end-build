@@ -36,26 +36,6 @@ RHINO_PATH = "lib/rhino.jar"
 require "rake"
 require "json"
 
-task :build_all, [:config] do |t, args|
-	$config_path = args.config
-	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
-	Dir.mkdir(TEMP) unless File.exists?(TEMP)
-	config.each{ |k, v|
-		case k
-		when "minifyjs"
-			minify_js(v)
-		when "minifycss"
-			minify_css(v)
-		when "minifyhtml"
-			minify_html(v)
-		when "validatejs"
-			validate_js(v)
-		when "validatecss"
-			validate_css(v)
-		end
-	}
-end
-
 OUTPUT_SEPARATOR = "----------------------------\n\n"
 
 CLOSURE_LEVELS = {
@@ -64,9 +44,17 @@ CLOSURE_LEVELS = {
 	"advanced" => "ADVANCED_OPTIMIZATIONS"
 }
 
+def concat(files, output)
+	File.open(output, "w") { |file|
+		file.puts files.map { |s|
+			IO.read(s)
+		}
+	}
+end
+
 # TODO: Add ability to specify `--externs` options to Closure compiler
 # TODO: Add ability to specify `--line-break`, `--nomunge`, `--preserve-semi` and `--disable-optimizations` arguments to YUI
-def minify_js(config)
+minifyjs = lambda { |config|
 	puts "\nMinifying JavaScript files"
 	puts OUTPUT_SEPARATOR
 	options = {
@@ -95,9 +83,9 @@ def minify_js(config)
 		}
 		concat(outputFiles, File.join($config_path, name))
 	}
-end
+}
 
-def validate_js(config)
+validatejs = lambda { |config|
 	puts "\nValidating JavaScript files"
 	puts OUTPUT_SEPARATOR
 	options = {
@@ -131,11 +119,11 @@ def validate_js(config)
 			puts "\tPassed!"
 		end
 	}
-end
+}
 
 # TODO: Look at other potential CSS minification tools (YUI is currently the only option in this script)
 # TODO: Investigate a reasonable line length for compressed file (500 has been plucked out of the air)
-def minify_css(config)
+minifycss = lambda { |config| 
 	puts "\nMinifying CSS files"
 	puts OUTPUT_SEPARATOR
 	options = {
@@ -157,10 +145,10 @@ def minify_css(config)
 		}
 		concat(outputFiles, File.join($config_path, name))
 	}
-end
+}
 
 # TODO: Investigate any other CSS lint tools (CSSLint is currently the only option in this script)
-def validate_css(config)
+validatecss = lambda { |config|
 	puts "\nValidating CSS files"
 	puts OUTPUT_SEPARATOR
 	options = {
@@ -187,11 +175,11 @@ def validate_css(config)
 			puts "\tPassed!"
 		end
 	}
-end
+}
 
 # TODO: Add ability to pass options to HtmlCompressor
 # TODO: Investigate any other HTML compression tools (HtmlCompressor is currently the only option in this script)
-def minify_html(config)
+minifyhtml = lambda { |config|
 	puts "\nMinifying markup files"
 	puts OUTPUT_SEPARATOR
 	options = {}
@@ -210,12 +198,21 @@ def minify_html(config)
 		}
 		concat(outputFiles, File.join($config_path, name))
 	}
-end
+}
 
-def concat(files, output)
-	File.open(output, "w") { |file|
-		file.puts files.map { |s|
-			IO.read(s)
-		}
+tasks = {
+	"minifyjs" => minifyjs,
+	"validatejs" => validatejs,
+	"minifycss" => minifycss,
+	"validatecss" => validatecss,
+	"minifyhtml" => minifyhtml
+}
+
+task :build_all, [:config] do |t, args|
+	$config_path = args.config
+	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
+	Dir.mkdir(TEMP) unless File.exists?(TEMP)
+	config.each{ |k, v|
+		tasks[k].call(v)
 	}
 end
