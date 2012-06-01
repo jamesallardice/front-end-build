@@ -179,6 +179,9 @@ minifyhtml = lambda { |config|
 	puts "\nMinifying markup files"
 	puts OUTPUT_SEPARATOR
 	options = {}
+	if config.key?("options")
+		options = options.merge(config["options"])
+	end
 	outputdir = config["outputdir"]
 	config["output"].each{ |name, output|
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
@@ -187,10 +190,14 @@ minifyhtml = lambda { |config|
 		output["input"].each_with_index{ |input, i|
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			puts "Compressing #{input['file']}..."
+			args = ""
+			inputOptions["htmlcompressoroptions"].each{ |option|
+				args << " --#{option}"
+			}
 			file = File.join($config_path, input["file"])
 			compiled = File.join(TEMP, "#{i}#{extension}")
 			outputFiles << compiled
-			system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compiled} #{file}"
+			system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compiled} #{args} #{file}"
 		}
 		concat(outputFiles, File.join($config_path, name))
 	}
