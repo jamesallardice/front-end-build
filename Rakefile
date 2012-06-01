@@ -4,7 +4,7 @@
 ###############################################################################################
 
 # The name of the config file to load (in the directory passed to the task as an argument)
-CONFIG_FILE = "build-conf.json"
+CONFIG_FILE = "build.json"
 
 # The name of the temporary directory (relative to this script) which will store intermediate files
 TEMP = "temp"
@@ -40,8 +40,8 @@ task :build_all, [:config] do |t, args|
 	Dir.mkdir(TEMP) unless File.exists?(TEMP)
 	config.each{ |k, v|
 		case k
-		when "js"
-			minify_js(v)
+		when "minifyjs"
+			minify_js_new(v)
 		when "css"
 			minify_css(v)
 		when "html"
@@ -61,12 +61,11 @@ CLOSURE_LEVELS = {
 # TODO: Add ability to specify `--externs` options to Closure compiler
 # TODO: Add ability to specify `--line-break`, `--nomunge`, `--preserve-semi` and `--disable-optimizations` arguments to YUI
 def minify_js(config)
-	puts "\nProcessing JavaScript files"
+	puts "\nMinifying JavaScript files"
 	puts OUTPUT_SEPARATOR
 	options = {
 		"compiler" => "closure",
-		"level" => "simple",
-		"lint" => false
+		"level" => "simple"
 	}
 	if config.key?("options")
 		options = options.merge(config["options"])
@@ -78,11 +77,8 @@ def minify_js(config)
 		output["input"].each_with_index{ |input, i|
 			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
 			file = File.join($config_path, input["file"])
-			if inputOptions["lint"]
-				validate_js(input["file"], inputOptions["lint"])
-			end
-			puts "Compressing #{input['file']}..."
 			compiled = File.join(TEMP, "#{i}.js")
+			puts "Compressing #{input['file']}..."
 			outputFiles << compiled
 			case inputOptions["compiler"]
 			when "closure"
