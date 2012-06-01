@@ -58,7 +58,7 @@ minifyjs = lambda { |config|
 	puts "\nMinifying JavaScript files"
 	puts OUTPUT_SEPARATOR
 	options = {
-		"compiler" => "closure",
+		"minifier" => "closure",
 		"level" => "simple"
 	}
 	if config.key?("options")
@@ -74,7 +74,7 @@ minifyjs = lambda { |config|
 			compiled = File.join(TEMP, "#{i}.js")
 			puts "Compressing #{input['file']}..."
 			outputFiles << compiled
-			case inputOptions["compiler"]
+			case inputOptions["minifier"]
 			when "closure"
 				system "java -jar #{CLOSURE_PATH} --compilation_level #{closureLevel} --js #{file} --js_output_file #{compiled}"
 			when "yui"
