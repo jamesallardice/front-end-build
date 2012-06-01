@@ -212,7 +212,7 @@ task :build_all, [:config] do |t, args|
 	$config_path = args.config
 	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
 	Dir.mkdir(TEMP) unless File.exists?(TEMP)
-	config.each{ |k, v|
-		tasks[k].call(v)
+	config.each{ |v|
+		tasks[v["task"]].call(v)
 	}
 end
