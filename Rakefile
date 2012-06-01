@@ -48,6 +48,8 @@ task :build_all, [:config] do |t, args|
 			minify_html(v)
 		when "validatejs"
 			validate_js(v)
+		when "validatecss"
+			validate_css(v)
 		end
 	}
 end
@@ -149,22 +151,33 @@ def minify_css(config)
 end
 
 # TODO: Investigate any other CSS lint tools (CSSLint is currently the only option in this script)
-def validate_css(file, options)
-	puts "Validating #{file}..."
-	path = File.join($config_path, file)
-	args = ""
-	options.each { |option|
-		args << "#{option},"
+def validate_css(config)
+	puts "\nValidating CSS files"
+	puts OUTPUT_SEPARATOR
+	options = {
+		"validator" => "csslint"
 	}
-	results = `java -jar #{RHINO_PATH} #{CSSLINT_PATH} #{path} --rules=#{args}`
-	noerror = /csslint\: No errors/
-	if !(noerror =~ results)
-		puts "\t#{results}"
-		puts "\n\tCSS validation failed.\n\n"
-		exit 1
-	else
-		puts "\tPassed!"
+	if config.key?("options")
+		options = options.merge(config["options"])
 	end
+	config["files"].each{ |file|
+		fileOptions = file.key?("options") ? options.merge(file["options"]) : options
+		puts "Validating #{file['file']}..."
+		args = ""
+		fileOptions["csslintoptions"].each{ |option|
+			args << "#{option},"
+		}
+		path = File.join($config_path, file["file"])
+		results = `java -jar #{RHINO_PATH} #{CSSLINT_PATH} #{path} --rules=#{args}`
+		noerror = /csslint\: No errors/
+		if !(noerror =~ results)
+			puts "\t#{results}"
+			puts "\n\tCSS validation failed.\n\n"
+			exit 1
+		else
+			puts "\tPassed!"
+		end
+	}
 end
 
 # TODO: Add ability to pass options to HtmlCompressor
