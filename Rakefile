@@ -44,7 +44,7 @@ task :build_all, [:config] do |t, args|
 			minify_js(v)
 		when "minifycss"
 			minify_css(v)
-		when "html"
+		when "minifyhtml"
 			minify_html(v)
 		end
 	}
@@ -156,16 +156,24 @@ end
 
 # TODO: Add ability to pass options to HtmlCompressor
 # TODO: Investigate any other HTML compression tools (HtmlCompressor is currently the only option in this script)
-# TODO: Investigate possibility of adding ability to concatenate HTML files (currently each file is compressed and that's it)
 def minify_html(config)
-	puts "\nProcessing markup files"
+	puts "\nMinifying markup files"
 	puts OUTPUT_SEPARATOR
+	options = {}
 	outputdir = config["outputdir"]
-	config["output"].each{ |input|
-		puts "Compressing #{input['file']}..."
-		file = File.join($config_path, input["file"])
-		compressed = File.join($config_path, outputdir, input["file"])
-		system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compressed} #{file}"
+	config["output"].each{ |name, output|
+		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
+		outputFiles = Array.new
+		extension = File.extname(name)
+		output["input"].each_with_index{ |input, i|
+			inputOptions = input.key?("options") ? outputOptions.merge(input["options"]) : outputOptions
+			puts "Compressing #{input['file']}..."
+			file = File.join($config_path, input["file"])
+			compiled = File.join(TEMP, "#{i}#{extension}")
+			outputFiles << compiled
+			system "java -jar #{HTMLCOMPRESSOR_PATH} -t html -o #{compiled} #{file}"
+		}
+		concat(outputFiles, File.join($config_path, name))
 	}
 end
 
