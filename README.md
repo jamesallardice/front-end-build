@@ -100,37 +100,37 @@ The Full Frontal build script depends on a number of third party tools. Everythi
 </thead>
 <tbody>
 <tr>
-<td>Rhino</td>
+<td><a href="http://www.mozilla.org/rhino/">Rhino</a></td>
 <td>1.7R3</td>
 <td>An implementation of JavaScript written in Java. Used to run various other tools.</td>
 </tr>
 <tr>
-<td>JSLint4Java</td>
+<td><a href="http://code.google.com/p/jslint4java/">JSLint4Java</a></td>
 <td>2.0.2</td>
 <td>A Java wrapper for JSLint. Used to validate JavaScript.</td>
 </tr>
 <tr>
-<td>JSHint Rhino</td>
+<td><a href="http://www.jshint.com/">JSHint Rhino</a></td>
 <td>Stable</td>
 <td>A JavaScript validation tool that runs on Rhino.</td>
 </tr>
 <tr>
-<td>CSSLint Rhino</td>
+<td><a href="http://csslint.net/">CSSLint Rhino</a></td>
 <td>0.9.8</td>
 <td>A CSS validation tool that runs on Rhino.</td>
 </tr>
 <tr>
-<td>Google Closure Compiler</td>
+<td><a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a></td>
 <td>r1918</td>
 <td>A JavaScript compiler that minifies and speeds up your JavaScript.</td>
 </tr>
 <tr>
-<td>YUI Compressor</td>
+<td><a href="http://developer.yahoo.com/yui/compressor/">YUI Compressor</a></td>
 <td>2.4.7</td>
 <td>A JavaScript and CSS minification tool.</td>
 </tr>
 <tr>
-<td>HtmlCompressor</td>
+<td><a href="http://code.google.com/p/htmlcompressor/">HtmlCompressor</a></td>
 <td>1.5.3</td>
 <td>An HTML and XML minification tool.</td>
 </tr>
