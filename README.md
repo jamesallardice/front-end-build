@@ -57,3 +57,32 @@ A number of tasks are available for use in your configuration file. Each task ha
 `minifycss` - Minify and combine CSS files to reduce file size
 
 `minifyhtml` - Minify and combine files containing markup
+
+### Output
+
+Chances are that the main thing you want to get out of your build script is a set of files. Full Frontal tries to be as flexible as possible and allows you to specify exactly what files you want it to produce (unfortunately this means your config file can become quite verbose for larger projects, but that's the price of flexibility). Tasks that can produce output should be given an `output` property. Here's a basic example using the `minifyjs` task to compress some JavaScript files:
+
+```javascript
+[
+    {
+        "task": "minifyjs",
+        "output": {
+            "mylibrary.min.js": {
+                "input": [
+                    { "file": "module1.js" },
+                    { "file": "module2.js" },
+                    { "file": "includes/include1.js" }
+                ]
+            },
+            "lib2/mylibrary2.min.js": {
+                "input": [
+                    { "file": "lib2/main.js" }
+                ]
+            }
+        }
+    }
+  }
+]
+```
+
+This example will produce 2 files, relative to the configuration file. *mylibrary.min.js* will be made up of the minified versions of *module1.js*, *module2.js* and *includes/include1.js*, all concatenated together. *lib2/mylibrary2.min.js* will be made up of just the one file, *lib2/main.js*.
