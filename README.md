@@ -81,7 +81,6 @@ Chances are that the main thing you want to get out of your build script is a se
             }
         }
     }
-  }
 ]
 ```
 
