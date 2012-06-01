@@ -3,13 +3,17 @@ Full Frontal
 
 A full front-end build suite to help prepare your assets for the web by reducing file sizes and improving confidence in your code. Features include JavaScript, CSS and HTML minification and validation.
 
+Full Frontal is for you if you want a quick and easy way to decrease the loading times of your web pages. It is designed as a basic, all-encompasing build tool to get you up and running in as little time as possible. It has been developed with a specific web app in mind, so it may not be exactly what you're looking for, but it should be easy enough to modify to suit your needs.
+
 ## Installation
 
 To get up and running, ensure the following are available on your system:
 
- - [Ruby](http://www.ruby-lang.org/en/downloads/)
+ - [Ruby](http://www.ruby-lang.org/en/downloads/) (see [RubyInstaller](http://rubyinstaller.org/) for a Windows installer)
  - [Ruby JSON gem](http://flori.github.com/json/)
  - [Java](http://java.com/en/download/index.jsp)
+
+Full Frontal has been tested on OS X Lion and Windows 7. It should run on any system that supports the above technologies.
 
 ## Usage
 
