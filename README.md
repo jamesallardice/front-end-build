@@ -1,9 +1,9 @@
-Full Frontal
+Front End Build
 ============
 
 A full front-end build suite to help prepare your assets for the web by reducing file sizes and improving confidence in your code. Features include JavaScript, CSS and HTML minification and validation.
 
-Full Frontal is for you if you want a quick and easy way to decrease the loading times of your web pages. It is designed as a basic, all-encompasing build tool to get you up and running in as little time as possible. It has been developed with a specific web app in mind, so it may not be exactly what you're looking for, but it should be easy enough to modify to suit your needs.
+Front End Build is for you if you want a quick and easy way to decrease the loading times of your web pages. It is designed as a basic, all-encompasing build tool to get you up and running in as little time as possible. It has been developed with a specific web app in mind, so it may not be exactly what you're looking for, but it should be easy enough to modify to suit your needs.
 
 ## Installation
 
@@ -13,7 +13,7 @@ To get up and running, ensure the following are available on your system:
  - [Ruby JSON gem](http://flori.github.com/json/)
  - [Java](http://java.com/en/download/index.jsp)
 
-Full Frontal has been tested on OS X Lion and Windows 7. It should run on any system that supports the above technologies.
+Front End Build has been tested on OS X Lion and Windows 7. It should run on any system that supports the above technologies.
 
 ## Usage
 
@@ -33,7 +33,7 @@ rake build
     
 ## Configuration
 
-Since Full Frontal is designed to be a complete front-end build tool, there are a multitude of options available to you, so you can get your output just as you like it. These options are all set in a single configuration file. By default, the build script looks for a file called *build.json*, in its own directory.
+Since Front End Build is designed to be a complete front-end build tool, there are a multitude of options available to you, so you can get your output just as you like it. These options are all set in a single configuration file. By default, the build script looks for a file called *build.json*, in its own directory.
 
 Configuration files are made up of lists of tasks. These tasks are executed in the order you define them. If you know any JavaScript, or have ever worked with JSON, then you should find it nice and easy to set up your config file. Here's a very simple example. We will come on to the tasks available to you soon.
 
@@ -52,19 +52,19 @@ Configuration files are made up of lists of tasks. These tasks are executed in t
 
 A number of tasks are available for use in your configuration file. Each task has various options and details specific to that task, so visit the Wiki pages for more information.
 
-[`validatejs` - Runs a JavaScript validation tool such as JSLint](https://github.com/jamesallardice/full-frontal/wiki/The-'validatejs'-task)
+[`validatejs` - Runs a JavaScript validation tool such as JSLint](https://github.com/jamesallardice/front-end-build/wiki/The-'validatejs'-task)
 
-[`validatecss` - Runs a CSS validation tool such as CSSLint](https://github.com/jamesallardice/full-frontal/wiki/The-'validatejs'-task)
+[`validatecss` - Runs a CSS validation tool such as CSSLint](https://github.com/jamesallardice/front-end-build/wiki/The-'validatejs'-task)
 
-[`minifyjs` - Minify and combine JavaScript files to reduce file size](https://github.com/jamesallardice/full-frontal/wiki/The-'minifyjs'-task)
+[`minifyjs` - Minify and combine JavaScript files to reduce file size](https://github.com/jamesallardice/front-end-build/wiki/The-'minifyjs'-task)
 
-[`minifycss` - Minify and combine CSS files to reduce file size](https://github.com/jamesallardice/full-frontal/wiki/The-'minifycss'-task)
+[`minifycss` - Minify and combine CSS files to reduce file size](https://github.com/jamesallardice/front-end-build/wiki/The-'minifycss'-task)
 
-[`minifyhtml` - Minify and combine files containing markup](https://github.com/jamesallardice/full-frontal/wiki/The-'minifyhtml'-task)
+[`minifyhtml` - Minify and combine files containing markup](https://github.com/jamesallardice/front-end-build/wiki/The-'minifyhtml'-task)
 
 ### Output
 
-Chances are that the main thing you want to get out of your build script is a set of files. Full Frontal tries to be as flexible as possible and allows you to specify exactly what files you want it to produce (unfortunately this means your config file can become quite verbose for larger projects, but that's the price of flexibility). Tasks that can produce output should be given an `output` property. Here's a basic example using the `minifyjs` task to compress some JavaScript files:
+Chances are that the main thing you want to get out of your build script is a set of files. Front End Build tries to be as flexible as possible and allows you to specify exactly what files you want it to produce (unfortunately this means your config file can become quite verbose for larger projects, but that's the price of flexibility). Tasks that can produce output should be given an `output` property. Here's a basic example using the `minifyjs` task to compress some JavaScript files:
 
 ```javascript
 [
@@ -92,7 +92,7 @@ This example will produce 2 files, relative to the configuration file. *mylibrar
 
 ## Bundled tools
 
-The Full Frontal build script depends on a number of third party tools. Everything that is required is bundled into the download packages, and can be found in the *lib* directory. Included tools are as follows:
+The Front End Build script depends on a number of third party tools. Everything that is required is bundled into the download packages, and can be found in the *lib* directory. Included tools are as follows:
 
 <table>
 <thead>
