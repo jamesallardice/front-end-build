@@ -4,7 +4,7 @@
 ###############################################################################################
 
 # The name of the config file to load (in the directory passed to the task as an argument)
-CONFIG_FILE = "build.json"
+CONFIG_FILE = "front-end-build.json"
 
 # The name of the temporary directory (relative to this script) which will store intermediate files
 TEMP = "temp"
@@ -216,7 +216,10 @@ task :build, [:config] do |t, args|
 	$config_path = args.config
 	config = JSON.parse(IO.read(File.join(args.config, CONFIG_FILE)))
 	Dir.mkdir(TEMP) unless File.exists?(TEMP)
-	config.each{ |v|
+	if config["root"]
+		$config_path = File.join($config_path, config["root"])
+	end
+	config["tasks"].each{ |v|
 		tasks[v["task"]].call(v)
 	}
 end
