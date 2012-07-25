@@ -64,7 +64,6 @@ minifyjs = lambda { |config|
 	if config.key?("options")
 		options = options.merge(config["options"])
 	end
-	closureLevel = CLOSURE_LEVELS[options["level"]]
 	config["output"].each{ |name, output|
 		outputOptions = output.key?("options") ? options.merge(output["options"]) : options
 		outputFiles = Array.new
@@ -76,6 +75,7 @@ minifyjs = lambda { |config|
 			outputFiles << compiled
 			case inputOptions["minifier"]
 			when "closure"
+				closureLevel = CLOSURE_LEVELS[inputOptions["level"]]
 				system "java -jar #{CLOSURE_PATH} --compilation_level #{closureLevel} --js #{file} --js_output_file #{compiled}"
 			when "yui"
 				system "java -jar #{YUI_PATH} --type js -o #{compiled} #{file}"
